@@ -4,7 +4,7 @@
     "description": "PWA LMS REST API using ExpressJS",
     "main": "index.js",
     "scripts": {
-        "build": "ttsc --build --clean && ttsc",
+        "build": "tsc --build",
         "start": "node ./dist/index.js",
         "dev": "concurrently \"ttsc --build --clean && ttsc --watch\" \"nodemon dist/index.js\""
     },
