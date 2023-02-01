@@ -87,7 +87,7 @@ export const User = db.define<UserModel>('users', {
     },
     refresh_token: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     role: {
         type: DataTypes.STRING,

@@ -1,11 +1,12 @@
 import { User, UserVerification } from '@/models/user';
-import { signUpSchema } from '@/dto';
+import { signUpSchema, signInSchema } from '@/dto';
 import { signJWT } from '@/config/jwt';
 import bycrypt from 'bcryptjs';
 import { createTransport } from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid'
 
 export class AuthService {
+
   private failedOrSuccessRequest(status: string, data: any) {
     return {
       status,
@@ -173,4 +174,57 @@ export class AuthService {
 
     return this.failedOrSuccessRequest('success', { accessToken, refreshToken })
   }
+  async signIn(email: string, password: string) {
+    const data = signInSchema.safeParse({ email, password });
+
+    if (!data.success) {
+      return this.failedOrSuccessRequest('error', data.error);
+    }
+
+    const user = await User.findOne({
+      where: {
+        email,
+      },
+    })
+
+    if (!user) {
+      return this.failedOrSuccessRequest('failed', 'Invalid Credentials')
+    } else if (!user.is_verified) {
+      return this.failedOrSuccessRequest('failed', 'Please verify your account first')
+    }
+
+    // update user session 
+    try {
+      await User.update({
+        has_session: true
+      }, {
+        where: {
+          id: user.id
+        }
+      })
+    } catch (error) {
+      return this.failedOrSuccessRequest('failed', error)
+    }
+    const accessToken = signJWT({ id: user.id, email: user.email, role: user.role }, '1d')
+    const refreshToken = signJWT({ id: user.id, email: user.email }, '1w')
+
+    //save the refresh token to the db
+    try {
+      const hashedRefreshToken = await bycrypt.hash(refreshToken, 12)
+      await User.update({
+        refresh_token: hashedRefreshToken
+      }, {
+        where: {
+          id: user.id as string
+        },
+      })
+    } catch (error) {
+      return this.failedOrSuccessRequest('failed', error)
+    }
+
+    return this.failedOrSuccessRequest('success', { accessToken, refreshToken })
+
+
+  }
+
 }
