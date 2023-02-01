@@ -39,4 +39,4 @@ jobs:
           host: ${{ secrets.VPS_HOSTNAME }}
           username: ${{ secrets.VPS_USERNAME }}
           password: ${{ secrets.VPS_PASSWORD }}
-          script: cd gambreng-backend/; git pull;npm;npm run dev;pm2 restart gambreng-backend;
+          script: cd gambreng-backend/; git pull;npm;npm run build;pm2 restart gambreng-backend;
