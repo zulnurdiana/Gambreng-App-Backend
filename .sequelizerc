@@ -1,0 +1,8 @@
+const path = require('path');
+
+module.exports = {
+  env: process.env.NODE_ENV || 'development',
+  config: path.resolve('dist', 'config', 'database', 'dbConfig.js'),
+  'models-path': path.resolve('dist', 'models'),
+  'migrations-path': path.resolve('dist', 'config', 'database', 'migrations'),
+};

@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "baseUrl": ".",
+        "outDir": "./dist",
+        "target": "es2016",
+        "module": "commonjs",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "paths": {
+            "@/*": ["./src/*"]
+        },
+        "plugins": [
+            // Transform paths in output .js files
+            {
+                "transform": "typescript-transform-paths"
+            }
+        ]
+    },
+    "exclude": ["node_modules"],
+    "include": ["**/*.ts", ".env"]
+}
