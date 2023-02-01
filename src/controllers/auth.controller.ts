@@ -78,15 +78,15 @@ export const signOut = async (req: Request, res: Response) => {
   // Remove accessToken and refreshToken from cookie
   res.cookie('GAMBRENG_AT', '', {
     maxAge: -1,
-    secure: false,
+    secure: true,
     sameSite: 'none',
-    httpOnly: false,
+    httpOnly: true
   })
   res.cookie('GAMBRENG_RT', '', {
     maxAge: -1,
-    secure: false,
+    secure: true,
     sameSite: 'none',
-    httpOnly: false
+    httpOnly: true
   })
   return getResponse(res, getHttpCode.OK, 'Sign Out Success', {})
 }
