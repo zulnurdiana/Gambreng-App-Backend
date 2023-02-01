@@ -2,7 +2,7 @@
     "compilerOptions": {
         "strict": true,
         "noImplicitAny": false,
-        "noEmitOnError": true,
+        "noEmitOnError": false,
         "baseUrl": ".",
         "outDir": "./dist",
         "target": "es2016",
