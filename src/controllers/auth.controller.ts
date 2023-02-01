@@ -5,8 +5,8 @@ import { getResponse, getHttpCode } from '@/utils';
 const authService = new AuthService();
 
 export const signUp = async (req: Request, res: Response) => {
-  const { email, password, confirmPassword } = req.body;
-  const result = await authService.signUp(email, password, confirmPassword);
+
+  const { email, password, confirmPassword } = req.body; const result = await authService.signUp(email, password, confirmPassword);
 
   if (result.status === 'failed') {
     return getResponse(res, getHttpCode.FORBIDDEN, result.data, {});
@@ -24,10 +24,22 @@ export const signIn = async (req: Request, res: Response) => {
     return getResponse(res, getHttpCode.FORBIDDEN, result.data, {});
   }
 
+  const { accessToken, refreshToken } = result.data
+  res.cookie('GAMBRENG_AT', accessToken, {
+    maxAge: 24 * 60 * 60 * 1000, // 1 day ,
+    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production' ? true : false,
+    httpOnly: true,
+  })
+  res.cookie('GAMBRENG_RT', refreshToken, {
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production' ? true : false,
+    httpOnly: true,
+  })
   return getResponse(res, getHttpCode.OK, 'User has been logged in', result.data);
 
 }
-
 
 export const verifyAccount = async (req: Request, res: Response) => {
   const { token, userId } = req.body;
@@ -42,14 +54,14 @@ export const verifyAccount = async (req: Request, res: Response) => {
   res.cookie('GAMBRENG_AT', accessToken, {
     maxAge: 24 * 60 * 60 * 1000, // 1 day ,
     sameSite: 'none',
-    secure: true,
-    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production' ? true : false,
+    httpOnly: true,
   })
   res.cookie('GAMBRENG_RT', refreshToken, {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
     sameSite: 'none',
-    secure: true,
-    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production' ? true : false,
+    httpOnly: true,
   })
 
   return getResponse(res, 200, 'Account Activated', { accessToken, refreshToken })
@@ -79,13 +91,13 @@ export const signOut = async (req: Request, res: Response) => {
   // Remove accessToken and refreshToken from cookie
   res.cookie('GAMBRENG_AT', '', {
     maxAge: -1,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production' ? true : false,
     sameSite: 'none',
     httpOnly: true
   })
   res.cookie('GAMBRENG_RT', '', {
     maxAge: -1,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production' ? true : false,
     sameSite: 'none',
     httpOnly: true
   })

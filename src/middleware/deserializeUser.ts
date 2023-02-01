@@ -79,7 +79,9 @@ export default async function deserializeUser(
   // Set the accessToken to cookies
   res.cookie('GAMBRENG_AT', newAccessToken, {
     maxAge: 24 * 60 * 60 * 1000, // 1 day
-    httpOnly: false
+    httpOnly: true,
+    sameSite: 'none',
+    secure: process.env.NODE_ENV === 'production' ? true : false
   })
 
   // @ts-ignore

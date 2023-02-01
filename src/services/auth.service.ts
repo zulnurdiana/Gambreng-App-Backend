@@ -15,15 +15,15 @@ export class AuthService {
   }
 
   async signUp(email: string, password: string, confirmPassword: string) {
-    const data = signUpSchema.safeParse({ email, password, confirmPassword });
+    const validateArgs = signUpSchema.safeParse({ email, password, confirmPassword });
 
-    if (!data.success) {
-      return this.failedOrSuccessRequest('error', data.error);
+    if (!validateArgs.success) {
+      return this.failedOrSuccessRequest('failed', validateArgs.error);
     }
 
     //create the user
     const hashedPassword = await bycrypt.hash(password, 12);
-    let user
+    let user;
     try {
       user = await User.create({
         email,
@@ -31,7 +31,7 @@ export class AuthService {
         role: 'user'
       })
     } catch (error) {
-      return this.failedOrSuccessRequest('error', error);
+      return this.failedOrSuccessRequest('failed', error);
     }
 
     // Create the user verification token
@@ -51,7 +51,7 @@ export class AuthService {
           id: user.id
         }
       });
-      return this.failedOrSuccessRequest('error', error);
+      return this.failedOrSuccessRequest('failed', error);
     }
 
     // TODO: Create transporter for nodemailer
@@ -95,10 +95,13 @@ export class AuthService {
   }
 
   async signIn(email: string, password: string) {
-    const data = signInSchema.safeParse({ email, password });
+    const validateArgs = signInSchema.safeParse({
+      email,
+      password,
+    });
 
-    if (!data.success) {
-      return this.failedOrSuccessRequest('error', data.error);
+    if (!validateArgs.success) {
+      return this.failedOrSuccessRequest('failed', validateArgs.error);
     }
 
     const user = await User.findOne({
@@ -109,11 +112,26 @@ export class AuthService {
 
     if (!user) {
       return this.failedOrSuccessRequest('failed', 'Invalid Credentials')
-    } else if (!user.is_verified) {
+    }
+
+    if (!user.is_verified) {
       return this.failedOrSuccessRequest('failed', 'Please verify your account first')
     }
 
+    // Check the password from user and password in db
+    const passwordMatches = await bycrypt.compare(password, user.password)
+
+    if (!passwordMatches) {
+      return this.failedOrSuccessRequest('failed', 'Invalid Credentials')
+    }
+
+    // Check if the user still has session or not
+    if (user.has_session) {
+      return this.failedOrSuccessRequest('failed', 'Bad Request')
+    }
+
     // update user session 
+    console.log(user.id)
     try {
       await User.update({
         has_session: true
@@ -125,6 +143,7 @@ export class AuthService {
     } catch (error) {
       return this.failedOrSuccessRequest('failed', error)
     }
+
     const accessToken = signJWT({ id: user.id, email: user.email, role: user.role }, '1d')
     const refreshToken = signJWT({ id: user.id, email: user.email }, '1w')
 
@@ -141,9 +160,9 @@ export class AuthService {
     } catch (error) {
       return this.failedOrSuccessRequest('failed', error)
     }
-
     return this.failedOrSuccessRequest('success', { accessToken, refreshToken })
   }
+
   async signOut(userId: number) {
     try {
       await User.update({
@@ -158,6 +177,7 @@ export class AuthService {
     }
     return this.failedOrSuccessRequest('success', {})
   }
+
   async sendChangePasswordEmail(email: string) {
     // TODO: Validate request data
     const result = changePasswordEmailSchema.safeParse({

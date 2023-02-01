@@ -7,7 +7,7 @@ interface EventAttributes {
   title: string
   image: string
   schedule: Date
-  locaton: string
+  location: string
   about: string
   contact_person: string
   link_map: string
@@ -22,24 +22,15 @@ export interface EventInput extends Optional<EventAttributes, 'id'> { }
 export interface EventOuput extends Required<EventAttributes> { }
 
 
-class Event extends Model<EventAttributes, EventInput> implements EventAttributes {
-
-  public id!: string
-  public title!: string
-  public image!: string
-  public schedule!: Date
-  public locaton!: string
-  public about!: string
-  public contact_person!: string
-  public link_map!: string
-
-  // timestamps!
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-
+interface EventInstance extends Model<EventAttributes, EventInput>,
+  EventAttributes {
+  createdAt?: Date
+  updatedAt?: Date
 }
 
-db.define<Event>('Event', {
+
+
+export const Event = db.define<EventInstance>('events', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -52,13 +43,13 @@ db.define<Event>('Event', {
   },
   image: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
   schedule: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
   },
-  locaton: {
+  location: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -77,5 +68,3 @@ db.define<Event>('Event', {
 }, {
   timestamps: true
 })
-
-export default Event
