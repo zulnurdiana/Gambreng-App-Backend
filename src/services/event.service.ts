@@ -1,7 +1,7 @@
 import { Event, EventInput } from '@/models/event';
 import { createEventSchema, deleteEventSchema, updateEventSchema, getAllEventSchema, getDetailEventSchema } from '@/dto';
 import fs from 'fs';
-import { getAllEvent } from '@/common/types';
+import { getAll } from '@/common/types';
 
 export class EventService {
   private failedOrSuccessRequest(status: string, data: any) {
@@ -32,7 +32,7 @@ export class EventService {
     }
   }
 
-  async getAllEvent(params: getAllEvent) {
+  async getAllEvent(params: getAll) {
     try {
       const validateArgs = getAllEventSchema.safeParse(params)
       if (!validateArgs.success) {
@@ -79,7 +79,9 @@ export class EventService {
 
   async updateEvent(id: string, payload: EventInput) {
     try {
-      const validateArgs = updateEventSchema.safeParse(payload);
+      const validateArgs = updateEventSchema.safeParse({
+        eventId: id
+      });
       if (!validateArgs.success) {
         return this.failedOrSuccessRequest('failed', validateArgs.error);
       }
