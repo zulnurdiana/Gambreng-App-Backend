@@ -70,8 +70,8 @@ export const verifyNewPassword = async (req: Request, res: Response) => {
 
 export const signOut = async (req: Request, res: Response) => {
   // @ts-ignore
-  const { email } = req.user
-  const result = await authService.signOut(email)
+  const { id } = req.user
+  const result = await authService.signOut(id)
   if (result.status === 'failed') {
     return getResponse(res, 403, result.data, {})
   }
