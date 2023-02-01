@@ -81,13 +81,13 @@ export const signOut = async (req: Request, res: Response) => {
     maxAge: -1,
     secure: true,
     sameSite: 'none',
-    httpOnly: false,
+    httpOnly: true
   })
   res.cookie('GAMBRENG_RT', '', {
     maxAge: -1,
     secure: true,
     sameSite: 'none',
-    httpOnly: false
+    httpOnly: true
   })
   return getResponse(res, getHttpCode.OK, 'Sign Out Success', {})
 }
