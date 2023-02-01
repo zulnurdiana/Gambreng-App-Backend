@@ -93,87 +93,7 @@ export class AuthService {
     }
     return this.failedOrSuccessRequest('success', {})
   }
-  async verifyAccount(token: string, userId: number) {
-    // TODO: Get the current user data for making the token later
-    const user = await User.findOne({
-      where: {
-        id: userId
-      },
-    })
 
-    if (!user) {
-      return this.failedOrSuccessRequest('failed', 'Failed to get the user')
-    }
-
-    // TODO: Check if the token with the current email is exist or not
-    const hashedUserVerification = await UserVerification.findOne({
-      where: {
-        userId: userId
-      }
-    })
-
-    if (!hashedUserVerification) {
-      return this.failedOrSuccessRequest('failed', 'Failed to get hashedUserVerification')
-    }
-
-    // TODO: Check if the token is valid or not
-    const tokenMatches = await bycrypt.compare(hashedUserVerification.hashed_token, token)
-
-    if (!tokenMatches) {
-      return this.failedOrSuccessRequest('failed', 'Invalid token')
-    }
-
-    // TODO: Check if the token is expired or not
-    let isExpired = false
-    if (hashedUserVerification.expires.getTime() < new Date().getTime()) {
-      isExpired = true
-    }
-
-    if (isExpired) {
-      return this.failedOrSuccessRequest('failed', 'UserVerification expired')
-    }
-
-    // TODO: Update isVerified column of user table in db
-    // TODO: Delete the userVerification in db
-    try {
-      await User.update({
-        is_verified: true,
-        has_session: true,
-      }, {
-        where: {
-          id: userId
-        }
-      })
-      await UserVerification.destroy({
-        where: {
-          id: hashedUserVerification.id
-        }
-      })
-    } catch (error) {
-      return this.failedOrSuccessRequest('failed', error)
-    }
-
-    // TODO: Create the access and refresh token then returned it
-    const accessToken = signJWT({ id: user.id, email: user.email, role: user.role }, '1d')
-    const refreshToken = signJWT({ id: user.id, email: user.email }, '1w')
-
-
-    // TODO: Save the refreshToken to the db
-    try {
-      const hashedRefreshToken = await bycrypt.hash(refreshToken, 12)
-      await User.update({
-        refresh_token: hashedRefreshToken
-      }, {
-        where: {
-          id: user.id as string
-        },
-      })
-    } catch (error) {
-      return this.failedOrSuccessRequest('failed', error)
-    }
-
-    return this.failedOrSuccessRequest('success', { accessToken, refreshToken })
-  }
   async signIn(email: string, password: string) {
     const data = signInSchema.safeParse({ email, password });
 
@@ -408,4 +328,87 @@ export class AuthService {
 
     return this.failedOrSuccessRequest('success', {})
   }
+
+  async verifyAccount(token: string, userId: number) {
+    // TODO: Get the current user data for making the token later
+    const user = await User.findOne({
+      where: {
+        id: userId
+      },
+    })
+
+    if (!user) {
+      return this.failedOrSuccessRequest('failed', 'Failed to get the user')
+    }
+
+    // TODO: Check if the token with the current email is exist or not
+    const hashedUserVerification = await UserVerification.findOne({
+      where: {
+        userId: userId
+      }
+    })
+
+    if (!hashedUserVerification) {
+      return this.failedOrSuccessRequest('failed', 'Failed to get hashedUserVerification')
+    }
+
+    // TODO: Check if the token is valid or not
+    const tokenMatches = await bycrypt.compare(token, hashedUserVerification.hashed_token)
+
+    if (!tokenMatches) {
+      return this.failedOrSuccessRequest('failed', 'Invalid token')
+    }
+
+    // TODO: Check if the token is expired or not
+    let isExpired = false
+    if (hashedUserVerification.expires.getTime() < new Date().getTime()) {
+      isExpired = true
+    }
+
+    if (isExpired) {
+      return this.failedOrSuccessRequest('failed', 'UserVerification expired')
+    }
+
+    // TODO: Update isVerified column of user table in db
+    // TODO: Delete the userVerification in db
+    try {
+      await User.update({
+        is_verified: true,
+        has_session: true,
+      }, {
+        where: {
+          id: userId
+        }
+      })
+      await UserVerification.destroy({
+        where: {
+          id: hashedUserVerification.id
+        }
+      })
+    } catch (error) {
+      return this.failedOrSuccessRequest('failed', error)
+    }
+
+    // TODO: Create the access and refresh token then returned it
+    const accessToken = signJWT({ id: user.id, email: user.email, role: user.role }, '1d')
+    const refreshToken = signJWT({ id: user.id, email: user.email }, '1w')
+
+
+    // TODO: Save the refreshToken to the db
+    try {
+      const hashedRefreshToken = await bycrypt.hash(refreshToken, 12)
+      await User.update({
+        refresh_token: hashedRefreshToken
+      }, {
+        where: {
+          id: user.id as string
+        },
+      })
+    } catch (error) {
+      return this.failedOrSuccessRequest('failed', error)
+    }
+
+    return this.failedOrSuccessRequest('success', { accessToken, refreshToken })
+  }
+
 }
