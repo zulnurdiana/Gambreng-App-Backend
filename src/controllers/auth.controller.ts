@@ -42,13 +42,13 @@ export const verifyAccount = async (req: Request, res: Response) => {
   res.cookie('GAMBRENG_AT', accessToken, {
     maxAge: 24 * 60 * 60 * 1000, // 1 day ,
     sameSite: 'none',
-    secure: false,
+    secure: true,
     httpOnly: false,
   })
   res.cookie('GAMBRENG_RT', refreshToken, {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
     sameSite: 'none',
-    secure: false,
+    secure: true,
     httpOnly: false,
   })
 
@@ -70,6 +70,7 @@ export const verifyNewPassword = async (req: Request, res: Response) => {
 
 export const signOut = async (req: Request, res: Response) => {
   // @ts-ignore
+  console.log(req.user)
   const { id } = req.user
   const result = await authService.signOut(id)
   if (result.status === 'failed') {
@@ -78,13 +79,13 @@ export const signOut = async (req: Request, res: Response) => {
   // Remove accessToken and refreshToken from cookie
   res.cookie('GAMBRENG_AT', '', {
     maxAge: -1,
-    secure: false,
+    secure: true,
     sameSite: 'none',
     httpOnly: false,
   })
   res.cookie('GAMBRENG_RT', '', {
     maxAge: -1,
-    secure: false,
+    secure: true,
     sameSite: 'none',
     httpOnly: false
   })
