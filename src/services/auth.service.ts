@@ -101,6 +101,7 @@ export class AuthService {
     });
 
     if (!validateArgs.success) {
+      console.log('sini')
       return this.failedOrSuccessRequest('failed', validateArgs.error);
     }
 
@@ -126,9 +127,9 @@ export class AuthService {
     }
 
     // Check if the user still has session or not
-    if (user.has_session) {
-      return this.failedOrSuccessRequest('failed', 'Bad Request')
-    }
+    // if (user.has_session) {
+    //   return this.failedOrSuccessRequest('failed', 'Bad Request')
+    // }
 
     // update user session 
     console.log(user.id)
