@@ -1,6 +1,8 @@
 # Folder
 dist
 node_modules
+public
+public\uploads
 
 # Files
 yarn.lock
