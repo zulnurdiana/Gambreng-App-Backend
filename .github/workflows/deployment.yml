@@ -1,0 +1,42 @@
+# CI Name
+name: 'Deployment'
+
+# Only running when
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    # Running on latest version of Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      # This action checks-out your repository under $GITHUB_WORKSPACE, so your workflow can access it.
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      # Setup Node for Installing Dependencies
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Installing Dependencies
+        run: npm install
+
+  deploy:
+    needs: build
+
+    # Running on latest version of Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploying to VPS
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOSTNAME }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: cd backend-gambreng/; git pull; npm install;pm2 restart backend-gambreng;
