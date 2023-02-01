@@ -1,5 +1,5 @@
-import { User, UserVerification } from '@/models/user';
-import { signUpSchema, signInSchema } from '@/dto';
+import { User, UserVerification, ChangePasswordToken } from '@/models/user';
+import { signUpSchema, signInSchema, changePasswordSchema, changePasswordEmailSchema } from '@/dto';
 import { signJWT } from '@/config/jwt';
 import bycrypt from 'bcryptjs';
 import { createTransport } from 'nodemailer';
@@ -223,8 +223,189 @@ export class AuthService {
     }
 
     return this.failedOrSuccessRequest('success', { accessToken, refreshToken })
+  }
+  async signOut(userId: number) {
+    try {
+      await User.update({
+        has_session: false
+      }, {
+        where: {
+          id: userId
+        }
+      })
+    } catch (error) {
+      return this.failedOrSuccessRequest('failed', error)
+    }
+    return this.failedOrSuccessRequest('success', {})
+  }
+  async sendChangePasswordEmail(email: string) {
+    // TODO: Validate request data
+    const result = changePasswordEmailSchema.safeParse({
+      email
+    })
 
+    if (!result.success) {
+      return this.failedOrSuccessRequest('failed', result.error.format())
+    }
 
+    // TODO: Find the user with following email address
+    const user = await User.findOne({
+      where: {
+        email
+      }
+    })
+
+    if (!user) {
+      return this.failedOrSuccessRequest('failed', 'User does not exist')
+    }
+
+    // TODO: Create changePasswordToken
+    const changePasswordToken = uuidv4() + '-' + uuidv4()
+    const hashedChangePasswordToken = await bycrypt.hash(changePasswordToken, 12)
+    const expiresTime = 15 * 60 * 1000 // 15 minutes
+
+    // TODO: Check if user has chanegPasswordToken in database
+    const changePasswordTokenInDB = await ChangePasswordToken.findOne({
+      where: {
+        userId: user.id as string
+      }
+    })
+
+    if (!changePasswordTokenInDB) {
+      // TODO: Create new changePasswordToken in db
+      try {
+        await ChangePasswordToken.create({
+          hashed_token: hashedChangePasswordToken,
+          userId: user.id as string,
+          expires: new Date(new Date().getTime() + expiresTime)
+        })
+      } catch (error) {
+        return this.failedOrSuccessRequest('failed', error)
+      }
+    } else {
+      // TODO: Update the current changePasswordToken
+      try {
+        await ChangePasswordToken.update({
+          hashed_token: hashedChangePasswordToken,
+          expires: new Date(new Date().getTime() + expiresTime)
+        }, {
+          where: {
+            userId: user.id as string
+          }
+        })
+      } catch (error) {
+        return this.failedOrSuccessRequest('failed', error)
+      }
+    }
+
+    // TODO: Create transporter for nodemailer
+    const transporter = createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.APP_EMAIL,
+        pass: process.env.APP_PASS,
+      }
+    })
+
+    // TODO: Set the nodemailer config
+    const mailOptions = {
+      to: email,
+      subject: 'Gambreng Change Password',
+      html: `<a href=${'gambreng.fajarbuana.my.id/password/verify/' + changePasswordToken + '/' + user.id}>Verify</a>`
+    }
+
+    // TODO: Send the account verification email to the user
+    let sendMailError;
+    transporter.sendMail(mailOptions, async (error) => {
+      if (error) {
+        sendMailError = error
+      }
+    })
+
+    if (sendMailError) {
+      // TODO: Remove the changePasswordToken that has been created
+      await ChangePasswordToken.destroy({
+        where: {
+          userId: user.id as string
+        }
+      })
+      return this.failedOrSuccessRequest('failed', sendMailError)
+    }
+
+    return this.failedOrSuccessRequest('success', {})
   }
 
+  async verifyNewPassword(token: string, userId: number, password: string, confirmPassword: string) {
+    // TODO: Verify request data
+    const result = changePasswordSchema.safeParse({
+      password,
+      confirmPassword,
+      userId,
+      token,
+    })
+
+    if (!result.success) {
+      return this.failedOrSuccessRequest('failed', result.error.format())
+    }
+
+
+    // TODO: Check if the token is valid or not
+    // TODO: Get the token from database with current userId
+    const hashedChangePasswordToken = await ChangePasswordToken.findOne({
+      where: {
+        userId: userId
+      }
+    })
+
+    if (!hashedChangePasswordToken) {
+      return this.failedOrSuccessRequest('failed', 'Token does not exist')
+    }
+
+    // TODO: Compare the token
+    const tokenMatches = await bycrypt.compare(token, hashedChangePasswordToken.hashed_token)
+
+    if (!tokenMatches) {
+      return this.failedOrSuccessRequest('failed', 'Invalid token')
+    }
+
+    // TODO: Check if the token does not expired
+    if (hashedChangePasswordToken.expires.getTime() < new Date().getTime()) {
+      return this.failedOrSuccessRequest('failed', 'Token is expired')
+    }
+
+    // TODO: Delete the changePasswordToken in database
+    try {
+      await ChangePasswordToken.destroy({
+        where: {
+          userId: userId
+        }
+      })
+    } catch (error) {
+      return this.failedOrSuccessRequest('failed', error)
+    }
+
+    // TODO: Check if the password and confirm password is same
+    if (password !== confirmPassword) {
+      return this.failedOrSuccessRequest('failed', 'Password and confirm password must be same')
+    }
+
+    // TODO: Hash the password
+    const hashedPassword = await bycrypt.hash(password, 12)
+
+    // TODO: Change user password in database
+    try {
+      await User.update({
+        password: hashedPassword,
+        is_verified: true
+      }, {
+        where: {
+          id: userId
+        }
+      })
+    } catch (error) {
+      return this.failedOrSuccessRequest('failed', error)
+    }
+
+    return this.failedOrSuccessRequest('success', {})
+  }
 }

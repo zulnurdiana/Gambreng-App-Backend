@@ -24,8 +24,10 @@
     },
     "homepage": "https://github.com/fajarbh14/perwibuan-lms-api#readme",
     "dependencies": {
+        "@types/cookie-parser": "^1.4.3",
         "@types/nodemailer": "^6.4.7",
         "bcryptjs": "^2.4.3",
+        "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "dotenv": "^16.0.1",
         "express": "^4.18.1",
