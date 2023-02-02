@@ -1,4 +1,5 @@
 import { Game, GameInput } from '@/models/game';
+import { GameForum } from '@/models/gameForum'
 import { createGameSchema, deleteGameSchema, updateGameSchema, getAllGameSchema, getDetailGameSchema } from '@/dto';
 import fs from 'fs';
 import { getAll } from '@/common/types';
@@ -26,6 +27,12 @@ export class GameService {
         procedure: payload.procedure,
         link_video: payload.link_video
       });
+
+      await GameForum.create({
+        title: game.title,
+        gamesId: game.id
+      })
+
       return this.failedOrSuccessRequest('success', game);
     } catch (error) {
       return this.failedOrSuccessRequest('failed', error);
@@ -121,6 +128,7 @@ export class GameService {
           id: id
         }
       });
+
       if (data) {
         fs.unlinkSync(`./public/uploads/${findGame.image}`)
       }

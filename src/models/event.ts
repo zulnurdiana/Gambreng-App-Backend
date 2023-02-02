@@ -19,7 +19,7 @@ interface EventAttributes {
 export interface EventInput extends Optional<EventAttributes, 'id'> { }
 
 // defines the returned object from model.create, model.update, and model.findOne
-export interface EventOuput extends Required<EventAttributes> { }
+export interface EventOutput extends Required<EventAttributes> { }
 
 
 interface EventInstance extends Model<EventAttributes, EventInput>,

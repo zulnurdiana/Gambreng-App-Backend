@@ -23,20 +23,6 @@ export const signIn = async (req: Request, res: Response) => {
   if (result.status === 'failed') {
     return getResponse(res, getHttpCode.FORBIDDEN, result.data, {});
   }
-
-  const { accessToken, refreshToken } = result.data
-  res.cookie('GAMBRENG_AT', accessToken, {
-    maxAge: 24 * 60 * 60 * 1000, // 1 day ,
-    sameSite: 'none',
-    secure: process.env.NODE_ENV === 'production' ? true : false,
-    httpOnly: true,
-  })
-  res.cookie('GAMBRENG_RT', refreshToken, {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    sameSite: 'none',
-    secure: process.env.NODE_ENV === 'production' ? true : false,
-    httpOnly: true,
-  })
   return getResponse(res, getHttpCode.OK, 'User has been logged in', result.data);
 
 }
@@ -51,18 +37,18 @@ export const verifyAccount = async (req: Request, res: Response) => {
   }
   const { accessToken, refreshToken } = result.data
 
-  res.cookie('GAMBRENG_AT', accessToken, {
-    maxAge: 24 * 60 * 60 * 1000, // 1 day ,
-    sameSite: 'none',
-    secure: process.env.NODE_ENV === 'production' ? true : false,
-    httpOnly: true,
-  })
-  res.cookie('GAMBRENG_RT', refreshToken, {
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-    sameSite: 'none',
-    secure: process.env.NODE_ENV === 'production' ? true : false,
-    httpOnly: true,
-  })
+  // res.cookie('GAMBRENG_AT', accessToken, {
+  //   maxAge: 24 * 60 * 60 * 1000, // 1 day ,
+  //   sameSite: 'none',
+  //   secure: process.env.NODE_ENV === 'production' ? true : false,
+  //   httpOnly: true,
+  // })
+  // res.cookie('GAMBRENG_RT', refreshToken, {
+  //   maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+  //   sameSite: 'none',
+  //   secure: process.env.NODE_ENV === 'production' ? true : false,
+  //   httpOnly: true,
+  // })
 
   return getResponse(res, 200, 'Account Activated', { accessToken, refreshToken })
 }

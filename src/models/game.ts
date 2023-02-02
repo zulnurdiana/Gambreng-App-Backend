@@ -1,6 +1,5 @@
 import { DataTypes, Model, Optional } from 'sequelize'
 import { db } from '../config/database'
-
 //Constructor 
 interface GameAttributes {
   id: string
@@ -66,3 +65,4 @@ export const Game = db.define<GameInstance>('games', {
 }, {
   timestamps: true
 })
+
