@@ -9,7 +9,10 @@ export default async function deserializeUser(
   res: Response,
   next: NextFunction
 ) {
-  const { GAMBRENG_AT: accessToken, GAMBRENG_RT: refreshToken } = req.cookies
+  // const { GAMBRENG_AT: accessToken, GAMBRENG_RT: refreshToken } = req.cookies
+  const authHeader = req.headers.authorization
+  const accessToken = authHeader?.split(' ')?.[1]
+  const refreshToken = ''
 
   if (!accessToken) {
     return next()
