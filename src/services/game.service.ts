@@ -8,7 +8,7 @@ export class GameService {
   private failedOrSuccessRequest(status: string, data: any) {
     return {
       status,
-      data
+      data,
     }
   }
 

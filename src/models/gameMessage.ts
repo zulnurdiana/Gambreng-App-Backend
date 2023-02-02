@@ -6,7 +6,7 @@ import { User } from './user'
 //Constructor
 interface GameMessageAttributes {
   id: string
-  forumGameId: string
+  gameForumId: string
   userId: string
   message: string
 }
@@ -22,13 +22,12 @@ export const GameMessage = db.define<GameMessageInstance>('game_messages', {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     allowNull: false,
-    primaryKey: false
+    primaryKey: true
   },
-  forumGameId: {
+  gameForumId: {
     type: DataTypes.UUID,
-    allowNull: false,
     references: {
-      model: 'game_forum',
+      model: 'game_forums',
       key: 'id'
     }
   },
@@ -46,12 +45,17 @@ export const GameMessage = db.define<GameMessageInstance>('game_messages', {
   }
 })
 
-GameForum.belongsTo(GameMessage, {
-  foreignKey: 'forumGameId',
+GameForum.hasMany(GameMessage, {
+  sourceKey: 'id',
+  as: 'game_messages'
+})
+
+GameMessage.belongsTo(GameForum, {
+  foreignKey: 'gameForumId',
   as: 'game_forum'
 })
 
-User.belongsTo(GameMessage, {
+GameMessage.belongsTo(User, {
   foreignKey: 'userId',
   as: 'users'
 })

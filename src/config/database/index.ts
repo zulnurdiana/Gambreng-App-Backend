@@ -13,4 +13,4 @@ export const db = new Sequelize(nodeEnv.database, nodeEnv.username, nodeEnv.pass
     dialect: nodeEnv.dialect as Dialect
 })
 
-db.sync({ alter: false })
+db.sync({ alter: true })

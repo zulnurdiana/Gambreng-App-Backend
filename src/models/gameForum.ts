@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { db } from '../config/database'
 import { Game } from './game'
+
 interface GameForumAttributes {
   id: string
   title: string
@@ -13,7 +14,7 @@ export interface GameForumOutput extends Required<GameForumAttributes> { }
 
 interface GameForumInstance extends Model<GameForumAttributes, GameForumInput> { }
 
-export const GameForum = db.define<GameForumInstance>('game_forum', {
+export const GameForum = db.define<GameForumInstance>('game_forums', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -33,7 +34,11 @@ export const GameForum = db.define<GameForumInstance>('game_forum', {
   }
 })
 
-Game.belongsTo(GameForum, {
+GameForum.belongsTo(Game, {
   foreignKey: 'gamesId',
   as: 'games'
 })
+
+
+
+
