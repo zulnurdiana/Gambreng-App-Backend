@@ -6,8 +6,12 @@ import { db } from "@/config/database";
 import routes from "@/routes";
 import cookieParser from "cookie-parser";
 import deserializeUser from "@/middleware/deserializeUser";
+const http = require('http');
 
 const app = express();
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
 
 app.use(cookieParser());
 app.use(json());
@@ -28,5 +32,15 @@ db.authenticate()
   .catch((error) =>
     console.error("[DB] Unable to connect to the database:", error)
   );
+
 app.use(routes);
-export default app;
+
+io.on('connection', (socket: any) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+});
+
+
+export default server;

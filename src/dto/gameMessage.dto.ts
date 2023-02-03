@@ -9,7 +9,3 @@ export const updateGameMessageSchema = z.object({
   gameId: z.string(),
   message: z.string(),
 });
-
-export const getGameMessageSchema = z.object({
-  gameId: z.string(),
-});

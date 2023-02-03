@@ -3,3 +3,4 @@ export * from './event.service';
 export * from './game.service';
 export * from './gameForum.service';
 export * from './gameMessage.service';
+export * from './globalMessage.service';
