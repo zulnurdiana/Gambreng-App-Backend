@@ -24,7 +24,7 @@ app.use(cors({
 ));
 app.use(helmet());
 app.use(urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/image', express.static(path.join(__dirname, "../../public/uploads")));
 app.use(deserializeUser)
 
 db.authenticate()
