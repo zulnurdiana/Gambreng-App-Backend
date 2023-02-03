@@ -22,7 +22,9 @@ app.use(cors({
   credentials: true
 }
 ));
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
 app.use(urlencoded({ extended: true }));
 app.use('/image', express.static(path.join(__dirname, "../../public/uploads")));
 app.use(deserializeUser)

@@ -36,7 +36,9 @@ export const GameForum = db.define<GameForumInstance>('game_forums', {
 
 GameForum.belongsTo(Game, {
   foreignKey: 'gamesId',
-  as: 'games'
+  as: 'games',
+  onDelete: 'CASCADE',
+  onUpdate: 'CASCADE'
 })
 
 

@@ -105,7 +105,18 @@ export class GameService {
           id: id
         }
       });
-      return this.failedOrSuccessRequest('success', {});
+      if (game) {
+
+        await GameForum.update({
+          title: payload.title
+        }, {
+          where: {
+            gamesId: id
+          }
+        })
+
+        return this.failedOrSuccessRequest('success', {});
+      }
     } catch (error) {
       return this.failedOrSuccessRequest('failed', error);
     }
@@ -128,6 +139,12 @@ export class GameService {
           id: id
         }
       });
+
+      await GameForum.destroy({
+        where: {
+          gamesId: id
+        }
+      })
 
       if (data) {
         fs.unlinkSync(`./public/uploads/${findGame.image}`)
