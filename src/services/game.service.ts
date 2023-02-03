@@ -106,7 +106,6 @@ export class GameService {
         }
       });
       if (game) {
-
         await GameForum.update({
           title: payload.title
         }, {
@@ -114,9 +113,8 @@ export class GameService {
             gamesId: id
           }
         })
-
-        return this.failedOrSuccessRequest('success', {});
       }
+      return this.failedOrSuccessRequest('success', {});
     } catch (error) {
       return this.failedOrSuccessRequest('failed', error);
     }
