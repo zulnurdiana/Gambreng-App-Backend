@@ -55,7 +55,7 @@ export const Game = db.define<GameInstance>('games', {
     allowNull: false,
   },
   procedure: {
-    type: DataTypes.TEXT,
+    type: DataTypes.JSON,
     allowNull: false,
   },
   link_video: {

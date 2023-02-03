@@ -6,7 +6,10 @@ export const createGameSchema = z.object({
   description: z.string(),
   max_player: z.string(),
   origin_game: z.string(),
-  procedure: z.string(),
+  procedure: z.object({
+    step: z.string(),
+    description: z.string(),
+  }),
   link_video: z.string(),
 });
 
