@@ -59,8 +59,8 @@ export const Game = db.define<GameInstance>('games', {
     allowNull: false,
   },
   link_video: {
-    type: DataTypes.STRING,
-    allowNull: false,
+    type: DataTypes.TEXT,
+    allowNull: false
   }
 }, {
   timestamps: true
