@@ -139,17 +139,12 @@ export class GameService {
         }
       });
 
-      const gameForum = await GameForum.destroy({
+      await GameForum.destroy({
         where: {
           gamesId: id
         }
       })
 
-      await GameMessage.destroy({
-        where: {
-          gameForumId: gameForum
-        }
-      })
 
       if (data) {
         fs.unlinkSync(`./public/uploads/${findGame.image}`)
