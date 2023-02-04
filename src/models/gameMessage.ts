@@ -52,7 +52,8 @@ GameForum.hasMany(GameMessage, {
 
 GameMessage.belongsTo(GameForum, {
   foreignKey: 'gameForumId',
-  as: 'game_forum'
+  as: 'game_forum',
+  onDelete: 'CASCADE'
 })
 
 GameMessage.belongsTo(User, {
