@@ -62,7 +62,7 @@ export const Event = db.define<EventInstance>('events', {
     allowNull: false,
   },
   link_map: {
-    type: DataTypes.TEXT,
+    type: DataTypes.STRING,
     allowNull: false,
   },
 }, {
