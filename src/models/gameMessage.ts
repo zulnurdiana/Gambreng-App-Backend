@@ -47,7 +47,9 @@ export const GameMessage = db.define<GameMessageInstance>('game_messages', {
 
 GameForum.hasMany(GameMessage, {
   sourceKey: 'id',
-  as: 'game_messages'
+  as: 'game_messages',
+  foreignKey: 'gameForumId',
+  onDelete: 'CASCADE'
 })
 
 GameMessage.belongsTo(GameForum, {

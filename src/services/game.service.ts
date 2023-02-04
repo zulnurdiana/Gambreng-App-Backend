@@ -1,5 +1,6 @@
 import { Game, GameInput } from '@/models/game';
-import { GameForum } from '@/models/gameForum'
+import { GameForum } from '@/models/gameForum';
+import { GameMessage } from '@/models/gameMessage';
 import { createGameSchema, deleteGameSchema, updateGameSchema, getAllGameSchema, getDetailGameSchema } from '@/dto';
 import fs from 'fs';
 import { getAll } from '@/common/types';
@@ -138,9 +139,15 @@ export class GameService {
         }
       });
 
-      await GameForum.destroy({
+      const gameForum = await GameForum.destroy({
         where: {
           gamesId: id
+        }
+      })
+
+      await GameMessage.destroy({
+        where: {
+          gameForumId: gameForum
         }
       })
 
