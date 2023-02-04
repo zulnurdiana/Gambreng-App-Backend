@@ -1,6 +1,7 @@
 import { GameForum } from '@/models/gameForum';
 import { GameMessage } from '@/models/gameMessage';
 import { User } from '@/models/user';
+import { getDetailGameForumSchema } from '@/dto';
 export class GameForumService {
 
   private failedOrSuccessRequest(status: string, data: any) {
@@ -27,9 +28,17 @@ export class GameForumService {
 
   async getGameForumById(id: string) {
     try {
+      const validateArgs = getDetailGameForumSchema.safeParse({
+        gamesId: id
+      });
+
+      if (!validateArgs.success) {
+        return this.failedOrSuccessRequest('failed', validateArgs.error);
+      }
+
       const data = await GameForum.findOne({
         where: {
-          id
+          gamesId: id
         },
         include: [{
           model: GameMessage,

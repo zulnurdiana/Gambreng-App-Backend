@@ -1,5 +1,6 @@
 export * from './auth.dto'
 export * from './event.dto'
 export * from './game.dto'
+export * from './gameForum.dto'
 export * from './gameMessage.dto'
 export * from './globalMessage.dto'
